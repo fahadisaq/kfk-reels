@@ -1,0 +1,26 @@
+name: KFK IG Scheduler
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Publish due reels
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node kfk-reels/publish.mjs
+      - name: Commit queue updates
+        run: |
+          git config user.name "kfk-bot"
+          git config user.email "kfk-bot@users.noreply.github.com"
+          git add kfk-reels/queue.json || true
+          git commit -m "chore: update reel queue [skip ci]" || echo "nothing to commit"
+          git push || echo "nothing to push"
