@@ -47,6 +47,7 @@ async function main() {
       console.error('Failed reel', job.id, job.lastError);
     }
   }
+  // prune posts older than 7 days to keep the queue small
   const week = 7 * 86400000;
   queue = queue.filter(j => !(j.status === 'posted' && j.postedAt && (now - j.postedAt) > week));
   if (changed) fs.writeFileSync(QUEUE, JSON.stringify(queue, null, 2) + '\n');
